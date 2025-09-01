@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Advanced Expense Tracker</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #28a745; /* Green */
+            --secondary-color: #6c757d; /* Gray */
+            --danger-color: #dc3545; /* Red */
+            --warning-color: #ffc107; /* Yellow */
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-color: #dee2e6;
+            --text-color: #333;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px; /* थोड़ा बड़ा */
+            margin: 20px auto;
+            padding: 15px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #218838);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+         h1 i {
+            font-size: 1.8rem;
+         }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease-in-out;
+        }
+         input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+         }
+        /* Prevent spinner on number input */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+         .btn:active {
+             transform: scale(0.98);
+         }
+
+        .btn-danger { background-color: var(--danger-color); }
+        .btn-danger:hover { background-color: #c82333; }
+        .btn-warning { background-color: var(--warning-color); color: var(--dark-color); }
+        .btn-warning:hover { background-color: #e0a800; }
+        .btn-secondary { background-color: var(--secondary-color); }
+        .btn-secondary:hover { background-color: #5a6268; }
+
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 10px; /* थोड़ा कम पैडिंग */
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--light-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        td {
+           font-size: 0.95rem;
+        }
+
+        /* Category colors using classes */
+        .category-food i { color: #e91e63; }
+        .category-transport i { color: #2196F3; }
+        .category-entertainment i { color: #FF9800; }
+        .category-shopping i { color: #9C27B0; }
+        .category-bill i { color: #F44336; }
+        .category-income i { color: #4CAF50; }
+        .category-other i { color: #607D8B; }
+
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+        .action-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .edit-btn { color: var(--secondary-color); }
+        .edit-btn:hover { color: var(--dark-color); }
+        .delete-btn { color: var(--danger-color); }
+        .delete-btn:hover { color: #a01c29; }
+
+        .summary-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--light-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+        .total-expense, .total-income, .balance {
+            font-weight: bold;
+        }
+        .total-expense { color: var(--danger-color); }
+        .total-income { color: var(--primary-color); }
+        .balance.positive { color: var(--primary-color); }
+        .balance.negative { color: var(--danger-color); }
+
+
+        .chart-container {
+            position: relative;
+            height: 300px; /* Increased height */
+            width: 100%;
+            margin-top: 25px;
+        }
+
+        .stats-card {
+            display: grid; /* Use grid for better alignment */
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 10px;
+            background-color: var(--light-color);
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+         .stat-label {
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+         }
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            background-color: var(--card-bg);
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 10px;
+            text-align: center;
+            background-color: transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--secondary-color);
+            transition: background-color 0.3s, color 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            /* background-color: rgba(40, 167, 69, 0.1); */
+        }
+         .tab:hover {
+             background-color: rgba(0,0,0,0.03);
+         }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+         @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+         }
+
+        .filter-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--light-color);
+            border-radius: 6px;
+        }
+
+        /* Modal for Editing */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+            animation: fadeInModal 0.3s ease;
+        }
+         @keyframes fadeInModal {
+             from { opacity: 0;}
+             to { opacity: 1;}
+         }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 500px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+             animation: slideIn 0.3s ease;
+        }
+         @keyframes slideIn {
+             from { transform: translateY(-30px); opacity: 0;}
+             to { transform: translateY(0); opacity: 1;}
+         }
+
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+        }
+        .modal h2 {
+            margin-top: 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                margin: 10px auto;
+            }
+            h1 { font-size: 1.6rem; }
+            h2 { font-size: 1.3rem; }
+            .btn { padding: 10px 15px; font-size: 0.95rem; }
+            th, td { padding: 10px 5px; font-size: 0.9rem; }
+            .chart-container { height: 250px; }
+            .stats-card { grid-template-columns: 1fr 1fr; } /* Two columns on smaller screens */
+            .summary-container { font-size: 1rem; flex-direction: column; gap: 5px; align-items: flex-start; }
+            .tab { font-size: 0.9rem; padding: 10px 5px;}
+             .filter-container { grid-template-columns: 1fr; }
+             .modal-content { width: 90%; margin: 20% auto;}
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-wallet"></i>Advanced Expense Tracker</h1>
+        </header>
+
+        <!-- Balance Summary -->
+        <div class="card summary-card">
+             <div class="summary-container">
+                 <div>कुल आय: <span class="total-income" id="total-income">₹0.00</span></div>
+                 <div>कुल खर्च: <span class="total-expense" id="total-expense">₹0.00</span></div>
+                 <div>बैलेंस: <span class="balance" id="balance">₹0.00</span></div>
+             </div>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab active" onclick="openTab(event, 'add-entry')"><i class="fas fa-plus-circle"></i> एंट्री जोड़ें</div>
+            <div class="tab" onclick="openTab(event, 'entry-list')"><i class="fas fa-list-ul"></i> सभी एंट्री</div>
+            <div class="tab" onclick="openTab(event, 'analysis')"><i class="fas fa-chart-pie"></i> विश्लेषण</div>
+        </div>
+
+        <!-- Add Entry Tab -->
+        <div id="add-entry" class="tab-content active">
+            <div class="card">
+                <h2><i class="fas fa-edit"></i> नई एंट्री जोड़ें</h2>
+                <div class="form-group">
+                    <label for="entry-type">एंट्री प्रकार</label>
+                    <select id="entry-type" onchange="toggleCategoryVisibility()">
+                        <option value="expense">खर्च (Expense)</option>
+                        <option value="income">आय (Income)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">विवरण</label>
+                    <input type="text" id="description" placeholder="विवरण दर्ज करें (जैसे, किराने का सामान, वेतन)">
+                </div>
+                <div class="form-group">
+                    <label for="amount">राशि (₹)</label>
+                    <input type="number" id="amount" placeholder="राशि दर्ज करें" min="0.01" step="0.01">
+                </div>
+                <div class="form-group" id="category-group">
+                    <label for="category">श्रेणी</label>
+                    <select id="category">
+                        <option value="food">🍔 भोजन</option>
+                        <option value="transport">🚗 परिवहन</option>
+                        <option value="entertainment">🎬 मनोरंजन</option>
+                        <option value="shopping">🛍️ खरीदारी</option>
+                        <option value="bill">🧾 बिल/किराया</option>
+                        <option value="other">❓ अन्य</option>
+                    </select>
+                </div>
+                 <div class="form-group" id="income-source-group" style="display: none;">
+                     <label for="income-source">आय स्रोत</label>
+                     <input type="text" id="income-source" placeholder="आय का स्रोत (जैसे, वेतन, फ्रीलांस)">
+                 </div>
+                <div class="form-group">
+                    <label for="date">तिथि</label>
+                    <input type="date" id="date">
+                </div>
+                <button class="btn" onclick="addEntry()"><i class="fas fa-check-circle"></i> एंट्री जोड़ें</button>
+            </div>
+        </div>
+
+        <!-- Entry List Tab -->
+        <div id="entry-list" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-clipboard-list"></i> एंट्री की सूची</h2>
+                <!-- Filter Controls -->
+                <div class="filter-container">
+                    <div>
+                        <label for="filter-start-date">प्रारंभ तिथि</label>
+                        <input type="date" id="filter-start-date">
+                    </div>
+                    <div>
+                        <label for="filter-end-date">अंतिम तिथि</label>
+                        <input type="date" id="filter-end-date">
+                    </div>
+                     <div>
+                         <label for="filter-category">श्रेणी</label>
+                         <select id="filter-category">
+                            <option value="all">सभी श्रेणियाँ</option>
+                            <option value="income">आय</option>
+                            <option value="food">🍔 भोजन</option>
+                            <option value="transport">🚗 परिवहन</option>
+                            <option value="entertainment">🎬 मनोरंजन</option>
+                            <option value="shopping">🛍️ खरीदारी</option>
+                            <option value="bill">🧾 बिल/किराया</option>
+                            <option value="other">❓ अन्य</option>
+                         </select>
+                     </div>
+                     <div>
+                         <label>&nbsp;</label> <!-- Placeholder for alignment -->
+                         <button class="btn btn-secondary" onclick="applyFilters()" style="width: auto; padding: 10px 15px;"><i class="fas fa-filter"></i> फ़िल्टर लागू करें</button>
+                         <button class="btn btn-secondary" onclick="resetFilters()" style="width: auto; padding: 10px 15px; margin-left: 5px;"><i class="fas fa-undo"></i> रीसेट</button>
+                     </div>
+                </div>
+                <table id="entries-table">
+                    <thead>
+                        <tr>
+                            <th>तिथि</th>
+                            <th>विवरण</th>
+                            <th>श्रेणी/स्रोत</th>
+                            <th>राशि</th>
+                            <th>कार्रवाई</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entry-list-body">
+                        <!-- Entries will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Analysis Tab -->
+        <div id="analysis" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> खर्च का विश्लेषण</h2>
+
+                <div class="stats-card">
+                    <div class="stat-item">
+                        <div class="stat-label">इस माह का खर्च</div>
+                        <div class="stat-value" id="month-total">₹0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">औसत दैनिक (माह)</div>
+                        <div class="stat-value" id="avg-daily">₹0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">सबसे अधिक खर्च</div>
+                        <div class="stat-value" id="highest-exp">₹0</div>
+                    </div>
+                     <div class="stat-item">
+                         <div class="stat-label">कुल एंट्री</div>
+                         <div class="stat-value" id="total-entries-count">0</div>
+                     </div>
+                </div>
+
+                <h3>श्रेणी द्वारा खर्च (व्यय)</h3>
+                <div class="chart-container">
+                    <canvas id="category-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2><i class="fas fa-pencil-alt"></i> एंट्री संपादित करें</h2>
+            <input type="hidden" id="edit-id">
+            <input type="hidden" id="edit-entry-type"> <!-- Store the type -->
+
+            <div class="form-group">
+                <label for="edit-description">विवरण</label>
+                <input type="text" id="edit-description">
+            </div>
+            <div class="form-group">
+                <label for="edit-amount">राशि (₹)</label>
+                <input type="number" id="edit-amount" min="0.01" step="0.01">
+            </div>
+            <!-- Category/Source fields will be shown/hidden dynamically -->
+             <div class="form-group" id="edit-category-group">
+                 <label for="edit-category">श्रेणी</label>
+                 <select id="edit-category">
+                     <option value="food">🍔 </option>
+                     <option value="transport">🚗 परिवहन</option>
+                     <option value="entertainment">🎬 मनोरंजन</option>
+                     <option value="shopping">🛍️ खरीदारी</option>
+                     <option value="bill">🧾 बिल/किराया</option>
+                     <option value="other">❓ अन्य</option>
+                 </select>
+             </div>
+            <div class="form-group" id="edit-income-source-group">
+                <label for="edit-income-source">आय स्रोत</label>
+                <input type="text" id="edit-income-source">
+            </div>
+            <div class="form-group">
+                <label for="edit-date">तिथि</label>
+                <input type="date" id="edit-date">
+            </div>
+            <button class="btn" onclick="saveEditedEntry()"><i class="fas fa-save"></i> बदलाव सहेजें</button>
+        </div>
+			
+		   
+    </div>
+                        
+    <script>
+        // --- Global Variables & DOM Elements ---
+        const addEntryTypeSelect = document.getElementById('entry-type');
+        const addCategoryGroup = document.getElementById('category-group');
+        const addIncomeSourceGroup = document.getElementById('income-source-group');
+        const addDescriptionInput = document.getElementById('description');
+        const addAmountInput = document.getElementById('amount');
+        const addCategorySelect = document.getElementById('category');
+        const addIncomeSourceInput = document.getElementById('income-source');
+        const addDateInput = document.getElementById('date');
+
+        const entryListBody = document.getElementById('entry-list-body');
+        const totalIncomeSpan = document.getElementById('total-income');
+        const totalExpenseSpan = document.getElementById('total-expense');
+        const balanceSpan = document.getElementById('balance');
+
+        const filterStartDateInput = document.getElementById('filter-start-date');
+        const filterEndDateInput = document.getElementById('filter-end-date');
+        const filterCategorySelect = document.getElementById('filter-category');
+
+        const monthTotalSpan = document.getElementById('month-total');
+        const avgDailySpan = document.getElementById('avg-daily');
+        const highestExpSpan = document.getElementById('highest-exp');
+        const totalEntriesCountSpan = document.getElementById('total-entries-count');
+
+        const editModal = document.getElementById('edit-modal');
+        const editIdInput = document.getElementById('edit-id');
+        const editEntryTypeInput = document.getElementById('edit-entry-type');
+        const editDescriptionInput = document.getElementById('edit-description');
+        const editAmountInput = document.getElementById('edit-amount');
+        const editCategoryGroup = document.getElementById('edit-category-group');
+        const editIncomeSourceGroup = document.getElementById('edit-income-source-group');
+        const editCategorySelect = document.getElementById('edit-category');
+        const editIncomeSourceInput = document.getElementById('edit-income-source');
+        const editDateInput = document.getElementById('edit-date');
+
+        const categoryChartCanvas = document.getElementById('category-chart');
+        let categoryChart = null; // Chart.js instance
+
+        // --- Data Management ---
+        let entries = JSON.parse(localStorage.getItem('entries')) || [];
+
+        function saveEntries() {
+            localStorage.setItem('entries', JSON.stringify(entries));
+        }
+
+        // --- Initialization ---
+        function init() {
+            addDateInput.valueAsDate = new Date(); // Default date for new entry
+            toggleCategoryVisibility(); // Set initial visibility
+            applyFilters(); // Initial render with no filters
+        }
+
+        // --- Tab Navigation ---
+        function openTab(event, tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            // Re-initialize or update chart when analysis tab is opened
+            if (tabName === 'analysis') {
+                updateAnalysis();
+            }
+        }
+
+        // --- Entry Addition ---
+        function toggleCategoryVisibility() {
+            const selectedType = addEntryTypeSelect.value;
+            if (selectedType === 'expense') {
+                addCategoryGroup.style.display = 'block';
+                addIncomeSourceGroup.style.display = 'none';
+            } else { // income
+                addCategoryGroup.style.display = 'none';
+                addIncomeSourceGroup.style.display = 'block';
+            }
+        }
+
+        function addEntry() {
+            const type = addEntryTypeSelect.value;
+            const description = addDescriptionInput.value.trim();
+            const amount = parseFloat(addAmountInput.value);
+            const date = addDateInput.value;
+            let category = type === 'expense' ? addCategorySelect.value : null;
+            let source = type === 'income' ? addIncomeSourceInput.value.trim() : null;
+
+            // Basic Validation
+            if ((type === 'expense' && !description) || (type === 'income' && !source) || isNaN(amount) || amount <= 0 || !date) {
+                alert('Please fill in all the required fields correctly.');
+                return;
+            }
+
+            const newEntry = {
+                id: Date.now(),
+                type, // 'expense' or 'income'
+                description: type === 'expense' ? description : source, // Use description for expense, source for income
+                amount,
+                category, // null for income
+                date
+            };
+
+            entries.push(newEntry);
+            saveEntries();
+
+            // Clear form
+            addDescriptionInput.value = '';
+            addAmountInput.value = '';
+            addIncomeSourceInput.value = '';
+            addDateInput.valueAsDate = new Date(); // Reset date
+
+            // Update UI
+            applyFilters(); // Re-render list with filters
+            showFeedback('एंट्री सफलतापूर्वक जोड़ी गई!', 'success');
+        }
+
+         // Simple feedback function
+         function showFeedback(message, type = 'success') {
+            // You can replace this with a more sophisticated notification system
+             alert(message);
+         }
+
+
+        // --- Entry Editing ---
+        function openEditModal(id) {
+            const entry = entries.find(e => e.id === id);
+            if (!entry) return;
+
+            editIdInput.value = entry.id;
+            editEntryTypeInput.value = entry.type; // Store type
+            editAmountInput.value = entry.amount;
+            editDateInput.value = entry.date;
+
+            if (entry.type === 'expense') {
+                editDescriptionInput.value = entry.description;
+                editCategorySelect.value = entry.category;
+                editCategoryGroup.style.display = 'block';
+                editIncomeSourceGroup.style.display = 'none';
+                editDescriptionInput.previousElementSibling.textContent = 'विवरण'; // Label
+            } else { // income
+                editIncomeSourceInput.value = entry.description; // Income source is stored in description field
+                editCategoryGroup.style.display = 'none';
+                editIncomeSourceGroup.style.display = 'block';
+                editIncomeSourceInput.previousElementSibling.textContent = 'आय स्रोत'; // Label
+            }
+
+            editModal.style.display = 'block';
+        }
+
+        function closeModal() {
+            editModal.style.display = 'none';
+        }
+
+        function saveEditedEntry() {
+            const id = parseInt(editIdInput.value);
+            const entryIndex = entries.findIndex(e => e.id === id);
+            if (entryIndex === -1) return;
+
+            const type = editEntryTypeInput.value;
+            const amount = parseFloat(editAmountInput.value);
+            const date = editDateInput.value;
+            let description = '';
+            let category = null;
+
+            if (type === 'expense') {
+                 description = editDescriptionInput.value.trim();
+                 category = editCategorySelect.value;
+                 if (!description || isNaN(amount) || amount <= 0 || !date) {
+                     alert('कृपया सभी आवश्यक फ़ील्ड सही ढंग से भरें।');
+                     return;
+                 }
+            } else { // income
+                 description = editIncomeSourceInput.value.trim(); // Save source in description
+                 if (!description || isNaN(amount) || amount <= 0 || !date) {
+                      alert('कृपया सभी आवश्यक फ़ील्ड सही ढंग से भरें।');
+                      return;
+                  }
+            }
+
+
+            entries[entryIndex] = {
+                ...entries[entryIndex], // Keep original id and type
+                description,
+                amount,
+                category, // Will be null for income
+                date
+            };
+
+            saveEntries();
+            closeModal();
+            applyFilters(); // Update the list
+            showFeedback('एंट्री सफलतापूर्वक अपडेट की गई!', 'success');
+        }
+
+        // Close modal if clicked outside content
+        window.onclick = function(event) {
+            if (event.target == editModal) {
+                closeModal();
+            }
+        }
+
+        // --- Entry Deletion ---
+        function deleteEntry(id) {
+            if (confirm('क्या आप वाकई इस एंट्री को हटाना चाहते हैं?')) {
+                entries = entries.filter(entry => entry.id !== id);
+                saveEntries();
+                applyFilters(); // Update the list
+                showFeedback('एंट्री सफलतापूर्वक हटाई गई!', 'info');
+            }
+        }
+
+
+        // --- Filtering ---
+        function applyFilters() {
+             const startDate = filterStartDateInput.value;
+             const endDate = filterEndDateInput.value;
+             const category = filterCategorySelect.value;
+
+             let filteredEntries = entries;
+
+             if (startDate) {
+                 filteredEntries = filteredEntries.filter(e => e.date >= startDate);
+             }
+             if (endDate) {
+                 // Add 1 day to end date to include the whole day
+                 // const endOfDay = new Date(endDate);
+                 // endOfDay.setDate(endOfDay.getDate() + 1);
+                 // filteredEntries = filteredEntries.filter(e => new Date(e.date) < endOfDay);
+                 // Simpler approach: filter by date string directly
+                  filteredEntries = filteredEntries.filter(e => e.date <= endDate);
+             }
+             if (category !== 'all') {
+                 if (category === 'income') {
+                     filteredEntries = filteredEntries.filter(e => e.type === 'income');
+                 } else {
+                     filteredEntries = filteredEntries.filter(e => e.type === 'expense' && e.category === category);
+                 }
+             }
+
+             renderEntryList(filteredEntries);
+             updateSummary(filteredEntries); // Update summary based on filtered data
+             updateAnalysis(); // Update analysis based on ALL data (usually desired)
+        }
+
+        function resetFilters() {
+            filterStartDateInput.value = '';
+            filterEndDateInput.value = '';
+            filterCategorySelect.value = 'all';
+            applyFilters();
+        }
+
+
+        // --- UI Rendering ---
+        function renderEntryList(entriesToRender) {
+            entryListBody.innerHTML = ''; // Clear existing list
+
+            if (entriesToRender.length === 0) {
+                entryListBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">कोई एंट्री नहीं मिली। फ़िल्टर समायोजित करें या नई एंट्री जोड़ें।</td></tr>';
+                return;
+            }
+
+            // Sort entries by date (newest first)
+            entriesToRender.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            entriesToRender.forEach(entry => {
+                const row = document.createElement('tr');
+                const dateObj = new Date(entry.date);
+                // More robust date formatting
+                const formattedDate = dateObj.toLocaleDateString('hi-IN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+                const categoryNames = { // For display
+                    food: '🍔 भोजन',
+                    transport: '🚗 परिवहन',
+                    entertainment: '🎬 मनोरंजन',
+                    shopping: '🛍️ खरीदारी',
+                    bill: '🧾 बिल/किराया',
+                    other: '❓ अन्य'
+                };
+
+                let categoryOrSourceHtml = '';
+                let amountHtml = '';
+
+                if (entry.type === 'expense') {
+                    categoryOrSourceHtml = `<span class="category-${entry.category}"><i class="fas ${getCategoryIcon(entry.category)}"></i> ${categoryNames[entry.category]}</span>`;
+                    amountHtml = `<span style="color: var(--danger-color);">- ₹${entry.amount.toFixed(2)}</span>`;
+                } else { // income
+                    categoryOrSourceHtml = `<span class="category-income"><i class="fas fa-briefcase"></i> आय</span>`;
+                    amountHtml = `<span style="color: var(--primary-color);">+ ₹${entry.amount.toFixed(2)}</span>`;
+                }
+
+
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${entry.description}</td>
+                    <td>${categoryOrSourceHtml}</td>
+                    <td>${amountHtml}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn edit-btn" onclick="openEditModal(${entry.id})" title="संपादित करें"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="action-btn delete-btn" onclick="deleteEntry(${entry.id})" title="हटाएं"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </td>
+                `;
+                entryListBody.appendChild(row);
+            });
+        }
+
+        function getCategoryIcon(category) {
+            switch (category) {
+                case 'food': return 'fa-utensils';
+                case 'transport': return 'fa-car';
+                case 'entertainment': return 'fa-film';
+                case 'shopping': return 'fa-shopping-bag';
+                case 'bill': return 'fa-file-invoice-dollar';
+                case 'other': return 'fa-question-circle';
+                default: return 'fa-dollar-sign';
+            }
+        }
+
+        function updateSummary(entriesForSummary) {
+            const totalIncome = entriesForSummary
+                                .filter(e => e.type === 'income')
+                                .reduce((sum, entry) => sum + entry.amount, 0);
+            const totalExpense = entriesForSummary
+                                .filter(e => e.type === 'expense')
+                                .reduce((sum, entry) => sum + entry.amount, 0);
+            const balance = totalIncome - totalExpense;
+
+            totalIncomeSpan.textContent = `₹${totalIncome.toFixed(2)}`;
+            totalExpenseSpan.textContent = `₹${totalExpense.toFixed(2)}`;
+            balanceSpan.textContent = `₹${balance.toFixed(2)}`;
+
+            // Add class for balance color
+            balanceSpan.classList.remove('positive', 'negative');
+            if (balance > 0) {
+                balanceSpan.classList.add('positive');
+            } else if (balance < 0) {
+                balanceSpan.classList.add('negative');
+            }
+        }
+
+
+        // --- Analysis ---
+        function updateAnalysis() {
+            // --- Calculations use ALL entries, regardless of filters ---
+            const allExpenses = entries.filter(e => e.type === 'expense');
+
+            // Current month expenses
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+
+            const thisMonthExpenses = allExpenses.filter(expense => {
+                const expenseDate = new Date(expense.date);
+                return expenseDate.getMonth() === currentMonth &&
+                       expenseDate.getFullYear() === currentYear;
+            });
+
+            // Calculate monthly total
+            const monthTotal = thisMonthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            monthTotalSpan.textContent = `₹${monthTotal.toFixed(2)}`;
+
+            // Calculate average daily
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const today = currentDate.getDate();
+            // Use number of days passed in the month for average
+            const daysPassed = Math.min(today, daysInMonth);
+            const avgDaily = daysPassed > 0 ? monthTotal / daysPassed : 0;
+            avgDailySpan.textContent = `₹${avgDaily.toFixed(2)}`;
+
+            // Find highest expense (overall)
+            const highestExp = allExpenses.length > 0 ?
+                Math.max(...allExpenses.map(expense => expense.amount)) : 0;
+            highestExpSpan.textContent = `₹${highestExp.toFixed(2)}`;
+
+            // Total entries count
+             totalEntriesCountSpan.textContent = entries.length;
+
+
+            // --- Chart Update ---
+            const categories = ['food', 'transport', 'entertainment', 'shopping', 'bill', 'other'];
+            const categoryLabels = ['भोजन', 'परिवहन', 'मनोरंजन', 'खरीदारी', 'बिल', 'अन्य'];
+            const categoryColors = ['#e91e63', '#2196F3', '#FF9800', '#9C27B0', '#F44336', '#607D8B'];
+
+            // Calculate totals by category using ALL expenses
+            const categoryTotals = categories.map(category => {
+                return allExpenses
+                    .filter(expense => expense.category === category)
+                    .reduce((sum, expense) => sum + expense.amount, 0);
+            });
+
+             // Destroy previous chart instance if it exists
+            if (categoryChart) {
+                categoryChart.destroy();
+            }
+
+            // Create new Chart.js Pie Chart
+            const ctx = categoryChartCanvas.getContext('2d');
+            categoryChart = new Chart(ctx, {
+                type: 'doughnut', // Changed to doughnut for better look
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        label: 'श्रेणी द्वारा खर्च',
+                        data: categoryTotals,
+                        backgroundColor: categoryColors,
+                        borderColor: '#fff', // Add border for separation
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allow chart to fill container height
+                    plugins: {
+                        legend: {
+                            position: 'bottom', // Move legend to bottom
+                             labels: {
+                                padding: 15 // Add padding to legend items
+                             }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += new Intl.NumberFormat('hi-IN', { style: 'currency', currency: 'INR' }).format(context.parsed);
+                                    }
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) + '%' : '0%';
+                                    label += ` (${percentage})`;
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Initialize ---
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+	
+
+</body>
+</html>
